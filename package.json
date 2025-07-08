@@ -4,7 +4,7 @@
   "description": "Cordova plugin to inject custom intent-filters into the AndroidManifest.xml for deep linking and other use cases.",
   "types": "./types/index.d.ts",
   "cordova": {
-    "id": "com.cordova.deeplinks.plugin",
+    "id": "cordova-plugin-deeplinks",
     "platforms": [
       "ios",
       "android"
@@ -24,17 +24,5 @@
     "ecosystem:cordova",
     "cordova-android",
     "cordova-ios"
-  ],
-  "scripts": {
-    "preversion": "npm run docs && rm -rf docs",
-    "version": "perl -i -pe 's/(version=)\"\\d+\\.\\d+\\.\\d+\"/$1\"'$npm_package_version'\"$2/' plugin.xml && git add .",
-    "postversion": "git push && git push --tags",
-    "predocs": "tsc www/* --declaration --allowJs --checkJs --lib es2015,dom --emitDeclarationOnly --outDir types",
-    "docs": "typedoc && perl -i -pe 's/README.md#/#/g' ./docs/README.md",
-    "postdocs": "perl -i -0pe 's/(<!-- TypedocGenerated -->).*/$1\n\n/gms' README.md && cat ./docs/README.md >> README.md"
-  },
-  "devDependencies": {
-    "typedoc": "^0.23.9",
-    "typedoc-plugin-markdown": "^3.13.4"
-  }
+  ]
 }
