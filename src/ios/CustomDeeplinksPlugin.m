@@ -4,10 +4,24 @@
 
 static NSString *pendingURL = nil;
 
+- (NSString *)safeJsonString:(NSString *)input {
+    if (input == nil) return @"\"\"";
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:@[input] options:0 error:&error];
+    if (!jsonData) {
+        return @"\"\"";
+    }
+    NSString *jsonArrayString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    if (jsonArrayString.length >= 2) {
+        return [jsonArrayString substringWithRange:NSMakeRange(1, jsonArrayString.length - 2)];
+    }
+    return @"\"\"";
+}
+
 - (void)pluginInitialize {
     if (pendingURL != nil) {
-        NSString *escapedURL = [pendingURL stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
-        NSString *js = [NSString stringWithFormat:@"window.CustomDeeplinks && window.CustomDeeplinks.onDeepLink && window.CustomDeeplinks.onDeepLink('%@');", escapedURL];
+        NSString *safeURLJson = [self safeJsonString:pendingURL];
+        NSString *js = [NSString stringWithFormat:@"window.CustomDeeplinks && window.CustomDeeplinks.onDeepLink && window.CustomDeeplinks.onDeepLink(%@);", safeURLJson];
         [self.commandDelegate evalJs:js];
         NSLog(@"[CustomDeeplinks] Fire pending universal link: %@", pendingURL);
         pendingURL = nil;
@@ -23,14 +37,15 @@ static NSString *pendingURL = nil;
     pendingURL = urlString;
 
     if (self.webViewEngine && self.webViewEngine.engineWebView) {
-        NSString *escapedURL = [urlString stringByReplacingOccurrencesOfString:@"'" withString:@"\\'"];
-        NSString *js = [NSString stringWithFormat:@"window.CustomDeeplinks && window.CustomDeeplinks.onDeepLink && window.CustomDeeplinks.onDeepLink('%@');", escapedURL];
+        NSString *safeURLJson = [self safeJsonString:urlString];
+        NSString *js = [NSString stringWithFormat:@"window.CustomDeeplinks && window.CustomDeeplinks.onDeepLink && window.CustomDeeplinks.onDeepLink(%@);", safeURLJson];
         [self.commandDelegate evalJs:js];
         NSLog(@"[CustomDeeplinks] Fire universal link immediately: %@", urlString);
     }
 
     return YES;
 }
+
 
 - (void)getPendingDeeplink:(CDVInvokedUrlCommand *)command {
     if (pendingURL != nil) {
@@ -46,6 +61,13 @@ static NSString *pendingURL = nil;
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }
+}
+
+- (void)clearPendingDeeplink:(CDVInvokedUrlCommand *)command {
+    NSLog(@"[CustomDeeplinks] Clearing pending URL via JS acknowledgment");
+    pendingURL = nil;
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 @end

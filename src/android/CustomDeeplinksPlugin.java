@@ -45,6 +45,10 @@ public class CustomDeeplinksPlugin extends CordovaPlugin {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.NO_RESULT));
             }
             return true;
+        } else if ("clearPendingDeeplink".equals(action)) {
+            pendingURL = null;
+            callbackContext.success();
+            return true;
         }
 
         return false;
@@ -75,8 +79,9 @@ public void onNewIntent(Intent intent) {
 
     private void fireDeepLinkToJS(String url) {
         if (webView != null) {
-            String escaped = url.replace("'", "\\'");
-            String js = "window.CustomDeeplinks && window.CustomDeeplinks.onDeepLink && window.CustomDeeplinks.onDeepLink('" + escaped + "');";
+            // Encode the string safely as a JSON string literal (handles backslashes, quotes, and wraps in quotes)
+            String safeUrlJson = org.json.JSONObject.quote(url);
+            String js = "window.CustomDeeplinks && window.CustomDeeplinks.onDeepLink && window.CustomDeeplinks.onDeepLink(" + safeUrlJson + ");";
             webView.getEngine().evaluateJavascript(js, null);
             Log.d(TAG, "Dispatched JS event with URL: " + url);
         } else {
@@ -84,3 +89,4 @@ public void onNewIntent(Intent intent) {
         }
     }
 }
+

@@ -1,79 +1,67 @@
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-xmlns:android="http://schemas.android.com/apk/res/android"
-           id="com.cordova.deeplinks.plugin"
-      version="1.0.0">
-
-    <name>CustomDeeplinksPlugin</name>
-
-    <engines>
-        <engine name="cordova" version=">=9.0.0"/>
-        <engine name="cordova-android" version=">=10.0.0"/>
-        <engine name="cordova-ios" version=">=5.0.0"/>
-    </engines>
-
-    <js-module src="www/CustomDeeplinks.js" name="CustomDeeplinks">
-        <clobbers target="CustomDeeplinks" />
-    </js-module>
-           
-    <preference name="APP_HOST" default="app_host" />
-    <preference name="APP_SCHEME" default="/" />
-    <preference name="APP_PATHPATTERN" default="/" />
-
-    <platform name="android">
-               
-        <hook type="after_prepare" src="hooks/androidCopyPreferences.js" />
-        <!--<hook type="after_compile" src="hooks/logManifest.js" />-->
-               
-        <config-file parent="/*" target="res/xml/config.xml">
-            <preference name="DOMAIN_URI_PREFIX" value="https://$APP_HOST$APP_PATHPATTERN"/>
-            <feature name="CustomDeeplinks">
-                <param name="android-package" value="com.cordova.deeplinks.plugin.CustomDeeplinksPlugin" />
-            </feature>
-        </config-file>
-
-           <config-file target="AndroidManifest.xml" parent="/manifest/application">
-               <activity android:exported="true"
-                         android:name="com.cordova.deeplinks.plugin.CustomDeeplinksActivity"
-                         android:theme="@android:style/Theme.NoDisplay">
-                   <intent-filter android:autoVerify="true">
-                       <action android:name="android.intent.action.VIEW" />
-                       <category android:name="android.intent.category.DEFAULT" />
-                       <category android:name="android.intent.category.BROWSABLE" />
-                       <data android:scheme="https" android:host="$APP_HOST" android:pathPrefix="$APP_PATHPATTERN" />
-                       <data android:scheme="http" android:host="$APP_HOST" android:pathPrefix="$APP_PATHPATTERN" />
-                   </intent-filter>
-               </activity>
-           </config-file>
-
-        <source-file src="src/android/CustomDeeplinksPlugin.java" target-dir="src/com/cordova/deeplinks/plugin" />
-        <source-file src="src/android/CustomDeeplinksActivity.java" target-dir="src/com/cordova/deeplinks/plugin" />
-    </platform>
-           
-    <platform name="ios">
-
-        <config-file target="config.xml" parent="/*">
-            <feature name="CustomDeeplinks">
-                   <param name="ios-package" value="CustomDeeplinksPlugin" />
-            </feature>
-        </config-file>
-               
-        <config-file target="*-Debug.plist" parent="com.apple.developer.associated-domains">
-            <array>
-                <string>applinks:$APP_HOST</string>
-            </array>
-        </config-file>
-
-        <config-file target="*-Release.plist" parent="com.apple.developer.associated-domains">
-            <array>
-                <string>applinks:$APP_HOST</string>
-            </array>
-        </config-file>
-
-        <source-file src="src/ios/CustomDeeplinksPlugin.h" />
-        <source-file src="src/ios/CustomDeeplinksPlugin.m" />
-        <source-file src="src/ios/AppDelegate+CustomDeeplinksPlugin.h" />
-        <source-file src="src/ios/AppDelegate+CustomDeeplinksPlugin.m" />
-     
-    </platform>
-    <asset src="www/CustomDeeplinks.js" target="CustomDeeplinks.js" />
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="com.cordova.deeplinks.plugin" version="1.6.1">
+	<name>CustomDeeplinksPlugin</name>
+	<engines>
+		<engine name="cordova" version=">=9.0.0"/>
+		<engine name="cordova-android" version=">=10.0.0"/>
+		<engine name="cordova-ios" version=">=5.0.0"/>
+	</engines>
+	<js-module src="www/CustomDeeplinks.js" name="CustomDeeplinks">
+		<clobbers target="CustomDeeplinks"/>
+	</js-module>
+	<preference name="APP_HOST" default="app_host"/>
+	<preference name="APP_BRANDED" default="app_branded"/>
+	<preference name="APP_SCHEME" default="/"/>
+	<preference name="APP_PATHPATTERN" default="/"/>
+	<preference name="ENABLE_APPSFLYER_DEEEPLINKS" default="false"/>
+	<platform name="android">
+		<hook type="after_prepare" src="hooks/androidCopyPreferences.js"/>
+		<!-- <hook type="after_compile" src="hooks/logManifest.js"/> -->
+		<config-file parent="/*" target="res/xml/config.xml">
+			<preference name="DOMAIN_URI_PREFIX" value="https://$APP_HOST$APP_PATHPATTERN"/>
+			<preference name="DOMAIN_URI_PREFIX_BRANDED" value="https://$APP_BRANDED$APP_PATHPATTERN"/>
+			<feature name="CustomDeeplinks">
+				<param name="android-package" value="com.cordova.deeplinks.plugin.CustomDeeplinksPlugin"/>
+			</feature>
+		</config-file>
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+			<activity android:exported="true" android:name="com.cordova.deeplinks.plugin.CustomDeeplinksActivity" android:theme="@android:style/Theme.NoDisplay">
+				<intent-filter android:autoVerify="true">
+					<action android:name="android.intent.action.VIEW"/>
+					<category android:name="android.intent.category.DEFAULT"/>
+					<category android:name="android.intent.category.BROWSABLE"/>
+					<data android:scheme="https" android:host="$APP_HOST" android:pathPrefix="$APP_PATHPATTERN"/>
+					<data android:scheme="http" android:host="$APP_HOST" android:pathPrefix="$APP_PATHPATTERN"/>
+					<data android:scheme="https" android:host="$APP_BRANDED" android:pathPrefix="$APP_PATHPATTERN"/>
+					<data android:scheme="http" android:host="$APP_BRANDED" android:pathPrefix="$APP_PATHPATTERN"/>
+				</intent-filter>
+			</activity>
+		</config-file>
+		<source-file src="src/android/CustomDeeplinksPlugin.java" target-dir="src/com/cordova/deeplinks/plugin"/>
+		<source-file src="src/android/CustomDeeplinksActivity.java" target-dir="src/com/cordova/deeplinks/plugin"/>
+	</platform>
+	<platform name="ios">
+		<hook type="after_prepare" src="hooks/iosCleanEntitlements.js"/>
+		<config-file target="config.xml" parent="/*">
+			<feature name="CustomDeeplinks">
+				<param name="ios-package" value="CustomDeeplinksPlugin"/>
+			</feature>
+		</config-file>
+		<config-file target="*-Debug.plist" parent="com.apple.developer.associated-domains">
+			<array>
+				<string>applinks:$APP_HOST</string>
+				<string>applinks:$APP_BRANDED</string>
+			</array>
+		</config-file>
+		<config-file target="*-Release.plist" parent="com.apple.developer.associated-domains">
+			<array>
+				<string>applinks:$APP_HOST</string>
+				<string>applinks:$APP_BRANDED</string>
+			</array>
+		</config-file>
+		<source-file src="src/ios/CustomDeeplinksPlugin.h"/>
+		<source-file src="src/ios/CustomDeeplinksPlugin.m"/>
+		<source-file src="src/ios/AppDelegate+CustomDeeplinksPlugin.h"/>
+		<source-file src="src/ios/AppDelegate+CustomDeeplinksPlugin.m"/>
+	</platform>
+	<asset src="www/CustomDeeplinks.js" target="CustomDeeplinks.js"/>
 </plugin>

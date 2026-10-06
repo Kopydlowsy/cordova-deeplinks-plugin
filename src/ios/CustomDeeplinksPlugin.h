@@ -5,5 +5,6 @@
 @interface CustomDeeplinksPlugin : CDVPlugin
 
 - (BOOL)handleUserActivity:(NSUserActivity *)userActivity;
+- (void)clearPendingDeeplink:(CDVInvokedUrlCommand *)command;
 
 @end

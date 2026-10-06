@@ -5,6 +5,8 @@ module.exports = {
   onDeepLink: function (url) {
     var event = new CustomEvent('deeplinks', { detail: { url: url } });
     window.dispatchEvent(event);
+    
+    exec(null, null, PLUGIN_NAME, 'clearPendingDeeplink', []);
   },
 
   getPendingDeeplink: function (callback) {
